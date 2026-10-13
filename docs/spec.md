@@ -13,6 +13,7 @@
 - **API Gateway (Express.js):** Приймає HTTP-запити, валідує payload, управляє CRUD-операціями для каналів та постів.
 - **Scheduler (Timer):** Періодично сканує таблицю `Posts` (де `status = 'scheduled'` і `scheduled_at <= NOW()`) і пушить їхні ID у чергу на виконання.
 - **Worker (Background Process):** Споживач черги. Забирає ID поста, дістає дані з БД, адаптує `content_payload` та виконує виклик до Telegram API. Оновлює таблиці `Posts` та `QueueJobs` за результатами.
+Виправлено за результатами аудиту: API Gateway суворо ізольований від Worker. Будь-які прямі імпорти коду з src/worker всередині src/api заборонені. API лише зберігає ID поста у таблицю QueueJobs.
 
 ## 4. Критерії Прийняття (Acceptance Criteria)
 1. Користувач може створити відкладений пост через API.
