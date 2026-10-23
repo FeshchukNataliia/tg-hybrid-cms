@@ -8,6 +8,7 @@
 - **Channels**: `id`, `user_id` (FK), `tg_chat_id`, `tg_bot_token`, `name`.
 - **Posts**: `id`, `channel_id` (FK), `content_payload` (JSONB для текстів та кнопок), `media_urls` (Array), `status` (draft, scheduled, published, failed), `scheduled_at`.
 - **QueueJobs**: `id`, `post_id` (FK), `attempts`, `error_log`, `executed_at`.
+Модуль Scheduler: (Аудит) Планувальник відкладених публікацій вилучено зі scope поточної версії та перенесено у беклог V2.
 
 ## 3. Архітектура та Межі (Модулі)
 - **API Gateway (Express.js):** Приймає HTTP-запити, валідує payload, управляє CRUD-операціями для каналів та постів.
