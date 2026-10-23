@@ -2,8 +2,8 @@
 const app = require("./app");
 const { initDb } = require("./db");
 const logger = require("./utils/logger"); // Наш крутий логер
-
 const PORT = 3000;
+require("./worker"); // Підключаємо воркер, щоб він почав слухати шину подій
 
 async function start() {
 	try {
