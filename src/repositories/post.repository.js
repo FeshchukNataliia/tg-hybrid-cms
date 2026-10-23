@@ -1,9 +1,10 @@
 // src/repositories/post.repository.js
 const { sql } = require("../db");
+const logger = require("../utils/logger");
 
 class PostRepository {
 	async create(postData) {
-		// RETURNING * повертає створений запис, щоб ми могли віддати його клієнту
+		logger.info("Виконання SQL-запиту: INSERT INTO posts...");
 		const result = await sql`
       INSERT INTO posts (user_id, title, content, status) 
       VALUES (${postData.userId}, ${postData.title}, ${postData.content}, 'draft') 
