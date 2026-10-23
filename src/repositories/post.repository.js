@@ -1,33 +1,35 @@
 // src/repositories/post.repository.js
-const posts = []; // Статичні дані (In-Memory БД)
-let currentId = 1;
+const { sql } = require("../db");
 
 class PostRepository {
 	async create(postData) {
-		const newPost = {
-			id: currentId++,
-			...postData,
-			status: "draft",
-			createdAt: new Date().toISOString(),
-		};
-		posts.push(newPost);
-		return newPost;
+		// RETURNING * повертає створений запис, щоб ми могли віддати його клієнту
+		const result = await sql`
+      INSERT INTO posts (user_id, title, content, status) 
+      VALUES (${postData.userId}, ${postData.title}, ${postData.content}, 'draft') 
+      RETURNING *
+    `;
+		return result[0];
 	}
 
 	async findAll() {
-		return posts; // У майбутньому тут буде імітація проблеми N+1
+		// Зараз це простий запит, пізніше (на Етапі 4) ми штучно зробимо тут проблему N+1
+		return sql`SELECT * FROM posts`;
 	}
 
 	async findById(id) {
-		return posts.find((p) => p.id === Number(id));
+		const result = await sql`SELECT * FROM posts WHERE id = ${id}`;
+		return result.length ? result[0] : null;
 	}
 
 	async updateStatus(id, status) {
-		const post = await this.findById(id);
-		if (post) {
-			post.status = status;
-		}
-		return post;
+		const result = await sql`
+      UPDATE posts 
+      SET status = ${status} 
+      WHERE id = ${id} 
+      RETURNING *
+    `;
+		return result.length ? result[0] : null;
 	}
 }
 
