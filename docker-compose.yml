@@ -1,0 +1,20 @@
+# docker-compose.yml
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: hybrid_cms
+    ports:
+      # Прокидаємо порт 5435 на хост (ліворуч), а всередині контейнера стандартний 5432 (праворуч)
+      - "5435:5432" 
+    volumes:
+      # Монтуємо наш SQL-скрипт у спеціальну папку для автозапуску
+      - ./src/db/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
