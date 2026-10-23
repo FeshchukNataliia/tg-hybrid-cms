@@ -1,2 +1,16 @@
+// src/server.js
 const app = require("./app");
-app.listen(3000, () => console.log("Server running on port 3000"));
+const { initDb } = require("./db");
+
+const PORT = 3000;
+
+async function start() {
+	// Явна ініціалізація ресурсів до запуску HTTP-сервера
+	await initDb();
+
+	app.listen(PORT, () => {
+		console.log(`[Server] API працює на порту ${PORT}`);
+	});
+}
+
+start();
