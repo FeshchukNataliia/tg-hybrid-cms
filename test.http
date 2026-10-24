@@ -1,0 +1,22 @@
+### 1. Створення чернетки поста (Успіх - має повернути 201)
+POST http://localhost:3000/posts
+Content-Type: application/json
+
+{
+  "title": "Перший пост",
+  "content": "Це тестовий контент для нашої CMS."
+}
+
+### 2. Помилка валідації (Має повернути 400 Bad Request від глобального обробника)
+POST http://localhost:3000/posts
+Content-Type: application/json
+
+{
+  "content": "Тут немає title"
+}
+
+### 3. Отримання стрічки (Має повернути масив з одним постом - статус draft)
+GET http://localhost:3000/posts
+
+### 4. Публікація поста (Має повернути 200 і статус published)
+POST http://localhost:3000/posts/1/publish
