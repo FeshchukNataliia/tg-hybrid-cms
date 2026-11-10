@@ -15,7 +15,8 @@
 	"type": "commonjs",
 	"main": "index.js",
 	"scripts": {
-		"test": "node --test",
+		"start": "node --env-file=.env src/server.js",
+		"test": "node --env-file=.env --test test/smoke.test.js",
 		"prepare": "husky",
 		"lint": "biome check"
 	},
