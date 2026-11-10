@@ -22,4 +22,4 @@
 - **Запуск БД:** `docker compose up -d` -> База піднята на порту 5435.
 - **Запуск API:** `node src/server.js` -> Сервер працює, логи з Trace ID виводяться в консоль.
 - **Тести:** `node --test test/smoke.test.js` -> Smoke-тест проходить успішно.
-- **Версія:** /version: [c9acbf9]
+- **Версія:** /version: [5653608]
