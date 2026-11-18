@@ -13,12 +13,17 @@ class PostRepository {
 
 	async findAll() {
 		const sql = getDb();
-		// Поки що простий селект, але тут ми скоро зробимо імітацію N+1
-		const result = await sql`
-      SELECT * FROM posts 
-      ORDER BY created_at DESC
+
+		console.log("[JOIN РІШЕННЯ] Виконуємо ОДИН об'єднаний запит...");
+		// Один запит замість 101!
+		const posts = await sql`
+      SELECT p.*, u.username as author_name 
+      FROM posts p
+      LEFT JOIN users u ON p.user_id = u.id
+      ORDER BY p.created_at DESC
     `;
-		return result;
+
+		return posts;
 	}
 
 	async findById(id) {
