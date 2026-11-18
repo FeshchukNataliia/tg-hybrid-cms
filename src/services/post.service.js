@@ -37,27 +37,33 @@ class PostService {
 
 	async publishPost(id) {
 		logger.info(`Запит на публікацію поста з ID: ${id}`);
-		const post = await postRepository.findById(id);
 
-		if (!post) {
-			throw new Error("NotFoundError: Пост не знайдено");
-		}
-		if (post.status === "published") {
-			logger.info(`Пост з ID: ${id} вже опубліковано, повертаємо існуючий`);
-			return post;
+		// ВАЛІДАЦІЯ: Захист від невірних типів (щоб не було 500 помилки)
+		if (isNaN(id) || parseInt(id) <= 0) {
+			throw new Error("ValidationError: Некоректний ID поста");
 		}
 
-		// Дістаємо контекст поточного HTTP-запиту
+		// АТОМАРНЕ ОНОВЛЕННЯ: База сама гарантує, що тільки один запит пройде успішно
+		const updatedPost = await postRepository.markAsQueued(id);
+
+		if (!updatedPost) {
+			// Якщо update не пройшов, перевіряємо чи пост взагалі існує
+			const existingPost = await postRepository.findById(id);
+			if (!existingPost) throw new Error("NotFoundError: Пост не знайдено");
+
+			logger.info(
+				`Пост з ID: ${id} вже в черзі або опубліковано. Ідемпотентна відмова.`,
+			);
+			return { message: "Пост вже опубліковано або знаходиться в обробці", id };
+		}
+
+		// Контекст та EventBus (Context Propagation)
 		const store = asyncLocalStorage.getStore();
 		const traceId = store ? store.get("traceId") : "UNKNOWN";
 		const userId = store ? store.get("userId") : "UNKNOWN";
 
-		logger.info("Відправка завдання на публікацію у фоновий воркер...");
-
-		// ПУБЛІКУЄМО ПОДІЮ У ШИНУ (Прокидаємо payload + контекст)
 		eventBus.emit("POST_PUBLISHED", { id, traceId, userId });
 
-		// Віддаємо миттєву відповідь клієнту (Event-Driven підхід)
 		return { message: "Пост прийнято до публікації (в черзі)", id };
 	}
 }

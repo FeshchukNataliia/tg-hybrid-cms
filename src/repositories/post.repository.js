@@ -30,6 +30,18 @@ class PostRepository {
 		return result[0];
 	}
 
+	// Атомарно переводимо пост у статус 'queued' тільки якщо він 'draft'
+	async markAsQueued(id) {
+		const sql = getDb();
+		const result = await sql`
+      UPDATE posts
+      SET status = 'queued'
+      WHERE id = ${id} AND status = 'draft'
+      RETURNING *
+    `;
+		return result[0]; // Поверне undefined, якщо пост не був draft
+	}
+
 	async updateStatus(id, status) {
 		const sql = getDb();
 		const result = await sql`

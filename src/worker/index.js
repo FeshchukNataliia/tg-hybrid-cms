@@ -14,18 +14,28 @@ eventBus.on("POST_PUBLISHED", async (payload) => {
 	store.set("traceId", traceId);
 	store.set("userId", userId);
 
-	// 2. Запускаємо роботу з БД ВСЕРЕДИНІ відновленого контексту
-	asyncLocalStorage.run(store, async () => {
-		try {
-			logger.info(`[WORKER] Початок фонової публікації поста ${id}...`);
+	try {
+		logger.info(`[WORKER] Початок фонової публікації поста ${id}...`);
 
-			// Штучна затримка для демонстрації асинхронності (можна прибрати)
-			await new Promise((resolve) => setTimeout(resolve, 1000));
+		// Імітація важкої роботи (наприклад, відправка в Telegram)
+		await new Promise((resolve) => setTimeout(resolve, 1000));
 
-			await postRepository.updateStatus(id, "published");
-			logger.info(`[WORKER] Пост ${id} успішно оновлено в БД`);
-		} catch (error) {
-			logger.error(`[WORKER] Помилка під час публікації поста ${id}`, error);
-		}
-	});
+		// Уявимо, що тут може статися помилка мережі. Якщо все ок:
+		await postRepository.updateStatus(id, "published");
+		logger.info(`[WORKER] Пост ${id} успішно опубліковано`);
+	} catch (error) {
+		logger.error(
+			`[WORKER] КРИТИЧНА ПОМИЛКА під час публікації поста ${id}`,
+			error,
+		);
+		// Компенсаційна дія: відмічаємо пост як failed
+		await postRepository
+			.updateStatus(id, "failed")
+			.catch((e) =>
+				logger.error(
+					`[WORKER] Не вдалося встановити статус failed для ${id}`,
+					e,
+				),
+			);
+	}
 });
