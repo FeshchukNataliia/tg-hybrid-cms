@@ -8,6 +8,11 @@ const app = express();
 
 app.use(express.json());
 
+// Ендпойнт для перевірки стану API (Healthcheck) та версії
+app.get("/version", (req, res) => {
+	res.status(200).json({ version: "1.0.0", status: "ok" });
+});
+
 // 1. Підключаємо контекст одразу після парсера JSON
 app.use(traceMiddleware);
 
